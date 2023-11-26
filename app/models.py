@@ -3,7 +3,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import User
 from Crypto.PublicKey.RSA import RsaKey
 from Crypto.PublicKey import RSA
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 
@@ -73,10 +73,15 @@ class Account(models.Model):
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_account(sender, instance, created, **kwargs):
     if created:
         key_pair = KeyPair.objects.create()
         Account.objects.create(user=instance, balance=0, key_pair=key_pair)
+
+
+@receiver(post_delete, sender=Account)
+def delete_account(sender, instance, **kwargs):
+    instance.key_pair.delete()
 
 
 class Transaction(models.Model):
