@@ -3,4 +3,5 @@ venv
 account_data.xlsx
 app/migrations/
 authentication/migrations/
-*__pycache__/
+*/__pycache__/
+db.sqlite3
