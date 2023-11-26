@@ -1,0 +1,33 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+    <div>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><a href="{% url 'transaction-list' 'incoming' %}">Incoming</a></th>
+                        <th><a href="{% url 'transaction-list' 'outgoing' %}">Outgoing</a></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div>
+            <table class="table">
+                {% if transaction_type == "incoming" %}
+                <thead><tr><th>№</th><th>Sender</th><th>Amount</th><th>Date and time</th></tr> </thead>
+                    {% for transaction in transactions %}
+                        <tr><td>{{ forloop.counter }}</td><td>{{ transaction.sender }}</td><td>{{ transaction.amount }}</td><td>{{ transaction.timestamp }}</td></tr>
+                    {% endfor %}
+                {% elif transaction_type == "outgoing" %}
+                    <thead><tr><th>№</th><th>Recipient</th><th>Amount</th><th>Date and time</th></tr></thead>
+                    {% for transaction in transactions %}
+                        <tr><td>{{ forloop.counter }}</td><td>{{ transaction.recipient }}</td><td>{{ transaction.amount }}</td><td>{{ transaction.timestamp }}</td></tr>
+                    {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

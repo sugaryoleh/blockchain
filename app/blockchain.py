@@ -14,9 +14,10 @@ class BlockchainManager:
             return True
 
     @staticmethod
-    def check_sum():
+    def check_sum() -> bool:
+        accounts = Account.objects.all()
         balance = 0
-        for obj in Account.objects.all():
+        for obj in accounts:
             balance += obj.balance
 
         if balance != Blockchain.objects.first().total:

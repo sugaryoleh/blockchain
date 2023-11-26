@@ -1,0 +1,43 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+    <form action="" method="POST" >
+        {% csrf_token %}
+        <div class="form-group">
+            <div>
+                <label for="first-name">First name</label><br>
+                <input type="text" id="first-name" name="first-name" value="{{ user.first_name }}">
+            </div>
+            <div>
+                <label for="last-name">Username</label><br>
+                <input type="text" id="last-name" name="last-name" value="{{ user.last_name }}">
+            </div>
+            <div>
+                <label for="username">Username</label><br>
+                <input type="text" id="username" name="username" value="{{ user.username }}">
+            </div>
+            <div>
+                <label for="email">Email</label><br>
+                <input type="text" id="email" name="email" value="{{ user.email }}">
+            </div>
+            <div>
+                <label for="phone">Phone</label><br>
+                <input type="text" id="phone" name="phone" value="{{ account.phone }}">
+            </div>
+            <div>
+                <label for="sms_notifications">SMS notifications</label>
+                <input type="checkbox" id="sms_notifications" name="sms_notifications" {% if account.sms_notifications %} checked {% endif %}>
+            </div>
+            <br>
+            <br>
+            <div>
+                <p id="balance">Balance: {{ profile.balance }}
+                    <a href="{% url 'replenish' %}">Replenish</a>
+                </p>
+            </div>
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+
+{% endblock %}

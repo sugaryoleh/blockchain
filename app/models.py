@@ -1,4 +1,5 @@
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import User
 from Crypto.PublicKey.RSA import RsaKey
 from Crypto.PublicKey import RSA
@@ -53,9 +54,11 @@ class KeyPair(models.Model):
 
 
 class Account(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='user')
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='user')
     balance = models.DecimalField(max_digits=20, decimal_places=5)
-    key_pair = models.OneToOneField(to=KeyPair, on_delete=models.PROTECT, related_name='keys')
+    key_pair = models.OneToOneField(to=KeyPair, on_delete=models.CASCADE, related_name='keys')
+    phone = PhoneNumberField(null=False, blank=False, unique=False)
+    sms_notifications = models.BooleanField(default=False)
 
     def __str__(self):
         return '{}'.format(self.user)
@@ -92,6 +95,9 @@ class Transaction(models.Model):
             self.signature = SignatureManager.sign(private_key=private_key, transaction=self)
         return super(Transaction, self).save(*args, **kwargs)
 
+    def __repr__(self):
+        return "{} --> {} [{}] @ {}".format(self.sender, self.recipient, self.amount, self.timestamp)
+
     def collect_hash_data(self) -> dict:
         return {
             'sender': self.sender.__str__(),
@@ -99,9 +105,6 @@ class Transaction(models.Model):
             'amount': float(self.amount),
             'timestamp': self.timestamp.__str__(),
         }
-
-    def __str__(self):
-        return str(self.collect_hash_data())
 
 
 class Block(models.Model):
@@ -111,7 +114,7 @@ class Block(models.Model):
     nonce = models.PositiveIntegerField()
 
     def hash(self):
-        return _hash(self.transaction, self.previous_hash, self.nonce)
+        return _hash(self.transaction.__repr__(), self.previous_hash, self.nonce)
 
 
 @receiver(post_save, sender=Transaction)

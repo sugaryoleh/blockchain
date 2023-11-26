@@ -1,10 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'authentication/base.html' %}
 
-</body>
-</html>
+{% block content %}
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="first_name" class="form-label">First name</label>
+            <input type="text" class="form-control" id="first_name" name="first_name">
+        </div>
+        <div class="mb-3">
+            <label for="last_name" class="form-label">Last name</label>
+            <input type="text" class="form-control" id="last_name" name="last_name">
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input type="text" class="form-control" id="phone" name="phone">
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="text" class="form-control" id="email" name="email">
+        </div>
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username">
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" id="password">
+        </div>
+        <div class="mb-3">
+            <label for="confirm_password" class="form-label">Confirm password</label>
+            <input type="password" class="form-control" name="confirm_password" id="confirm_password">
+        </div>
+        <input type="submit" value="Sign up" class="btn btn-secondary">
+    </form>
+
+{% endblock %}

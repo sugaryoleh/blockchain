@@ -1,0 +1,18 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+    <form action="" method="POST" >
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="receiver" class="form-label">Receiver username</label>
+            <input type="text" class="form-control" id="receiver" name="receiver">
+        </div>
+        <div>
+            <label for="amount">Amount</label><br>
+            <input type="number" id="amount" name="amount" value=0>
+        </div>
+        <input type="submit" value="Transfer">
+    </form>
+
+{% endblock %}
