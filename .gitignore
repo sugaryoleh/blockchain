@@ -1,5 +1,6 @@
 venv
 .idea
 account_data.xlsx
-app/migrations
-authentication/migrations
+app/migrations/
+authentication/migrations/
+*__pycache__/
