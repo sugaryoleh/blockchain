@@ -15,12 +15,14 @@ class SMSManager:
         self.client = Client(self.account_sid, self.auth_token)
 
     def send_message(self, text: str, to: str) -> None:
-        # self.client.messages.create(
-        #     from_='+12676139604',
-        #     body=text,
-        #     to=to
-        # )
-        print("{} sent to {}".format(text, to))
+        message = self.client.messages.create(
+            from_='+12676139604',
+            body=text,
+            to=to
+        )
+        print(message)
+        print(message.status)
+        print("{} sent to {}".format(text, '+380502265769'))
 
     def create_new_account_message(self, account) -> None:
         message = "Welcome {}! Your account has been successfully created!".format(account.user.username)

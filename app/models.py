@@ -59,6 +59,7 @@ class Account(models.Model):
     key_pair = models.OneToOneField(to=KeyPair, on_delete=models.CASCADE, related_name='keys')
     phone = PhoneNumberField(null=False, blank=False, unique=False)
     sms_notifications = models.BooleanField(default=False)
+    profile_image = models.ImageField(null=True, blank=True, upload_to="images/")
 
     def __str__(self):
         return '{}'.format(self.user)

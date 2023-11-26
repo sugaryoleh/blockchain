@@ -1,43 +1,104 @@
 {% extends 'app/base.html' %}
+{% load static %}
 
 {% block content %}
 
-    <form action="" method="POST" >
-        {% csrf_token %}
-        <div class="form-group">
-            <div>
-                <label for="first-name">First name</label><br>
-                <input type="text" id="first-name" name="first-name" value="{{ user.first_name }}">
+<div class="container" xmlns="http://www.w3.org/1999/html">
+    <div class="row gutters">
+        {% if not disabled %} <form  class="row gutters" action="{% url 'update-user-profile' %}" method="POST" enctype="multipart/form-data"> {% endif %}
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="account-settings">
+                            <div class="user-profile">
+                                <div class="user-avatar">
+                                    {% if account.profile_image %}
+                                    <img src="{{ account.profile_image.url }}">
+                                    {% else %}
+                                    <img src="{% static 'default/default_avatar.jpg' %}">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if not disabled %}
+                                        <label for="img">Upload</label>
+                                        <input type="file" id="img" name="img" accept="image/*">
+                                    {% endif %}
+                                </div>
+                                <h5 class="user-name">{{ user.first_name }} {{ user.last_name }}</h5>
+                                <h6 class="user-email">@{{ user.username }}</h6>
+                            </div>
+                            <div class="about">
+                                <h5>Balance</h5>
+                                <h6>{{ account.balance }}</h6>
+                                <a href="{% url 'replenish' %}">Top up</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label for="last-name">Username</label><br>
-                <input type="text" id="last-name" name="last-name" value="{{ user.last_name }}">
-            </div>
-            <div>
-                <label for="username">Username</label><br>
-                <input type="text" id="username" name="username" value="{{ user.username }}">
-            </div>
-            <div>
-                <label for="email">Email</label><br>
-                <input type="text" id="email" name="email" value="{{ user.email }}">
-            </div>
-            <div>
-                <label for="phone">Phone</label><br>
-                <input type="text" id="phone" name="phone" value="{{ account.phone }}">
-            </div>
-            <div>
-                <label for="sms_notifications">SMS notifications</label>
-                <input type="checkbox" id="sms_notifications" name="sms_notifications" {% if account.sms_notifications %} checked {% endif %}>
-            </div>
-            <br>
-            <br>
-            <div>
-                <p id="balance">Balance: {{ profile.balance }}
-                    <a href="{% url 'replenish' %}">Replenish</a>
-                </p>
-            </div>
-            <input type="submit" value="Submit">
-        </div>
-    </form>
+            <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                {% csrf_token %}
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="row gutters">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <h6 class="mb-2 text-primary">Personal Details</h6>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="first-name">First Name</label>
+                                    <input type="text" class="form-control" id="first-name" name="first-name" value="{{ user.first_name }}" {{ disabled }}>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="last-name">Last name</label>
+                                    <input type="text" class="form-control" id="last-name" name="last-name" value="{{ user.last_name }}" {{ disabled }}>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="phone">Phone</label>
+                                    <input type="text" class="form-control" id="phone" name="phone" value="{{ account.phone }}" {{ disabled }}>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" {{ disabled }}>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <input type="checkbox"  class="checkbox-style" id="sms_notifications" name="sms_notifications" {% if account.sms_notifications %} checked {% endif %} {{ disabled }}>
+                                    <label for="sms_notifications">SMS notifications</label>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                <div class="form-group">
+                                </div>
+                            </div>
+                        </div>
 
+                        <div class="row gutters">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="text-right">
+                                    {% if disabled %}
+                                    <form action="{% url 'update-user-profile' %}">
+                                        <input type="submit" id="edit" name="edit" class="btn btn-primary" value="Edit">
+                                    </form>
+                                    {% endif %}
+                                    {% if not disabled %}
+                                        <input type="submit" id="submit" name="edit" class="btn btn-primary" value="Submit">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% if not disabled %} </form> {% endif %}
+    </div>
+</div>
+<link rel="stylesheet" type="text/css" href="{% static 'app/css/style.css' %}">
 {% endblock %}

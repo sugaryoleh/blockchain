@@ -1,21 +1,30 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from SMS.sms import SMSManager
 from authentication.validators import validate_email, validate_phone
 from .models import Account, Transaction
-from django.core.mail import send_mail
 from .transactions import TransactionManager
 
 
 @login_required
 def profile(request):
-    user = request.user
     account = Account.objects.get(user=request.user)
+    context = {
+        'disabled': 'disabled',
+        'account': account
+    }
+    return render(request, 'app/profile.html', context=context)
+
+
+@login_required
+def update_profile(request):
+    user = request.user
+    account = Account.objects.get(user=user)
     if request.method == "POST":
-        user.username = request.POST['username']
         user.first_name = request.POST['first-name']
         user.last_name = request.POST['last-name']
         account.sms_notifications = request.POST.get('sms_notifications', False) == 'on'
@@ -25,7 +34,13 @@ def profile(request):
             user.phone = request.POST['phone']
         user.save()
         account.save()
-        return redirect(request.path_info)
+        # processing file
+        file = request.FILES.get('img')
+        if file:
+            file_name = default_storage.save('images/'+file.name, file)
+            file_ = default_storage.open(file_name)
+            account.profile_image.save(file_name, file_)
+        return redirect('user-profile')
     else:
         context = {
             'account': account

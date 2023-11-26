@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +11,7 @@
     <div class="container">
         <header class="d-flex justify-content-center py-3">
             <ul class="nav nav-pills">
-                <li class="nav-item"><a href="{% url 'users-profile' %}" class="nav-link">Profile</a></li>
+                <li class="nav-item"><a href="{% url 'user-profile' %}" class="nav-link">Profile</a></li>
                 <li class="nav-item"><a href="{% url 'replenish' %}" class="nav-link">Replenish</a></li>
                 <li class="nav-item"><a href="{% url 'create-transaction' %}" class="nav-link">Transfer</a></li>
                 <li class="nav-item"><a href="{% url 'transaction-list' 'incoming' %}" class="nav-link">Transaction history</a></li>
