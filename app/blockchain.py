@@ -9,7 +9,11 @@ class BlockchainManager:
         for i in range(1, len(chain)):
             _previous = chain[i].previous_hash
             _current = chain[i-1].hash()
-            if _previous != _current or _current[:difficulty] != '0' * difficulty:
+            if _previous != _current:
+                print("previous {}, current {} - not equal".format(_previous, _current))
+                return False
+            elif _current[:difficulty] != '0' * difficulty:
+                print("doesnt start with 0: {}".format(_current))
                 return False
             return True
 

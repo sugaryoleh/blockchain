@@ -13,8 +13,7 @@
             <ul class="nav nav-pills">
                 <li class="nav-item"><a href="{% url 'user-profile' %}" class="nav-link">Profile</a></li>
                 <li class="nav-item"><a href="{% url 'replenish' %}" class="nav-link">Replenish</a></li>
-                <li class="nav-item"><a href="{% url 'create-transaction' %}" class="nav-link">Transfer</a></li>
-                <li class="nav-item"><a href="{% url 'transaction-list' 'incoming' %}" class="nav-link">Transaction history</a></li>
+                <li class="nav-item"><a href="{% url 'transactions' 'incoming' %}" class="nav-link">Transactions</a></li>
                 <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link">Log out</a></li>
             </ul>
         </header>

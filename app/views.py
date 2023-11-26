@@ -49,7 +49,15 @@ def update_profile(request):
 
 
 @login_required
-def create_transaction(request):
+def transactions(request, transaction_type="incoming"):
+    account = Account.objects.get(user=request.user)
+    if transaction_type == 'incoming':
+        _transactions = Transaction.objects.filter(recipient=account)
+    elif transaction_type == 'outgoing':
+        _transactions = Transaction.objects.filter(sender=account)
+    else:
+        return HttpResponse('Page does not exist')
+
     user = request.user
     if request.method == "POST":
         sender = Account.objects.get(user=user)
@@ -61,13 +69,13 @@ def create_transaction(request):
                 SMSManager().transfer_message(transaction)
         except Exception as e:
             messages.add_message(request, messages.INFO, e)
-        return redirect('create-transaction')
+        return redirect(request.path_info)
     else:
-        receiver_options = Account.objects.exclude(user=user)
         context = {
-            'receiver_options': receiver_options,
+            'transaction_type': transaction_type,
+            'transactions': _transactions,
         }
-        return render(request, 'app/create_transaction.html', context=context)
+        return render(request, 'app/transactions.html', context=context)
 
 
 @login_required
@@ -85,19 +93,3 @@ def replenish(request):
         return redirect('replenish')
     else:
         return render(request, 'app/replenish.html')
-
-
-@login_required
-def transactions(request, transaction_type):
-    account = Account.objects.get(user=request.user)
-    if transaction_type == 'incoming':
-        _transactions = Transaction.objects.filter(recipient=account)
-    elif transaction_type == 'outgoing':
-        _transactions = Transaction.objects.filter(sender=account)
-    else:
-        return HttpResponse('Page does not exist')
-    context = {
-        'transaction_type': transaction_type,
-        'transactions': _transactions,
-    }
-    return render(request, 'app/transaction_list.html', context=context)

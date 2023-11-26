@@ -62,8 +62,6 @@ class TransactionManager:
         transaction = TransactionManager._create_transaction(sender, recipient_account, amount)
         TransactionManager._perform_transaction(transaction)
 
-        print(BlockchainManager.check_sum())
-
         return transaction
 
     # @staticmethod
@@ -89,8 +87,6 @@ class TransactionManager:
             bc.total = float(bc.total) + amount
             bc.save()
             account.receive(amount)
-
-            print(BlockchainManager.check_sum())
 
         else:
             raise Exception("Oops. something went wrong. Please check card info or make sure you have enough funds.")

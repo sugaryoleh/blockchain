@@ -129,13 +129,19 @@ def mine(sender, instance, created, **kwargs):
         difficulty = Blockchain.objects.first().difficulty
         block = Block(transaction=instance, nonce=0)
         try:
-            block.previous_hash = Block.objects.reverse()[0].hash()
+            block.previous_hash = Block.objects.order_by("pk").reverse()[0].hash()
         except IndexError:
             block.previous_hash = '0' * 64
 
         while True:
             if block.hash()[:difficulty] == '0' * difficulty:
+                print("success, 4*0: {}".format(block.hash()))
+                print("hash data: transaction {}; prev hash: {}; nonce {}".format(block.transaction.__repr__(),
+                                                                                  block.previous_hash, block.nonce))
                 block.save()
+                print("updated, 4*0: {}".format(block.hash()))
+                print("hash data: transaction {}; prev hash: {}; nonce {}".format(block.transaction.__repr__(),
+                                                                                  block.previous_hash, block.nonce))
                 break
             else:
                 block.nonce += 1
