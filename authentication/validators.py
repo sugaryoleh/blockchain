@@ -1,8 +1,19 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-import re
+from django.contrib.auth.models import User
 
 from django.core.handlers.wsgi import WSGIRequest
+
+import re
+
+
+def validate_username(username: str, request: WSGIRequest) -> bool:
+    users = User.objects.all()
+    for user in users:
+        if username == user.username:
+            messages.add_message(request, messages.INFO, "User with username {} already exists".format(username))
+            return False
+    return True
 
 
 def validate_password(password: str, request: WSGIRequest) -> bool:
@@ -41,15 +52,15 @@ def validate_email(email: str, request: WSGIRequest) -> bool:
 
 
 def validate_phone(phone: str, request: WSGIRequest) -> bool:
-    pat = r'^\+?1?\d{12}$'
+    pat = r'^\+?1?\d{11,12}$'
     if re.match(pat, phone):
         return True
     messages.add_message(request, messages.INFO, "Phone doesn't meet requirements")
     return False
 
 
-def verify_credentials(first_name: str, last_name:str, email: str, phone: str, username: str, password: str,
-                       confirmed_password: str, request: WSGIRequest) -> bool:
+def validate_account_data_register(first_name: str, last_name: str, phone: str, username: str, password: str,
+                                   confirmed_password: str, request: WSGIRequest) -> bool:
     for u in get_user_model().objects.all():
         if username == u.username:
             messages.add_message(request, messages.INFO, "Such username already exists")
@@ -58,19 +69,27 @@ def verify_credentials(first_name: str, last_name:str, email: str, phone: str, u
         messages.add_message(request, messages.INFO, "Passwords do not match")
         return False
 
-    if not validate_password(password, request):
-        return False
+    validators = [validate_password(password, request),
+                  validate_first_and_last_name(first_name, request),
+                  validate_first_and_last_name(last_name, request),
+                  validate_username(username, request),
+                  validate_phone(phone, request),
+                  ]
 
-    if not validate_first_and_last_name(first_name, request):
-        return False
+    if all(validator for validator in validators):
+        return True
 
-    if not validate_first_and_last_name(last_name, request):
-        return False
+    return False
 
-    if not validate_email(email, request):
-        return False
 
-    if not validate_phone(phone, request):
-        return False
+def validate_account_data_update(first_name: str, last_name: str, email: str, phone: str, request: WSGIRequest) -> bool:
+    validators = [validate_first_and_last_name(first_name, request),
+                  validate_first_and_last_name(last_name, request),
+                  validate_email(email, request),
+                  validate_phone(phone, request),
+                  ]
 
-    return True
+    if all(validator for validator in validators):
+        return True
+
+    return False

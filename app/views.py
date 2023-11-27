@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from SMS.sms import SMSManager
-from authentication.validators import validate_email, validate_phone
+from authentication.validators import validate_account_data_register, validate_account_data_update
 from .models import Account, Transaction
 from .transactions import TransactionManager
 
@@ -25,13 +25,14 @@ def update_profile(request):
     user = request.user
     account = Account.objects.get(user=user)
     if request.method == "POST":
-        user.first_name = request.POST['first-name']
-        user.last_name = request.POST['last-name']
+        if not validate_account_data_update(first_name=request.POST['first_name'], last_name=request.POST['last_name'],
+                                            email=request.POST['email'], phone=request.POST['phone'], request=request):
+            return redirect(request.path_info)
+        user.first_name = request.POST['first_name']
+        user.last_name = request.POST['last_name']
         account.sms_notifications = request.POST.get('sms_notifications', False) == 'on'
-        if validate_email(request.POST['email'], request):
-            user.email = request.POST['email']
-        if validate_phone(request.POST['phone'], request):
-            user.phone = request.POST['phone']
+        user.email = request.POST['email']
+        user.phone = request.POST['phone']
         user.save()
         account.save()
         # processing file
@@ -64,7 +65,7 @@ def transactions(request, transaction_type="incoming"):
         receiver = request.POST['receiver']
         amount = request.POST['amount']
         try:
-            transaction = TransactionManager.transfer(sender, receiver, float(amount))
+            transaction = TransactionManager.transfer(sender, receiver, int(amount))
             if transaction.recipient.sms_notifications:
                 SMSManager().transfer_message(transaction)
         except Exception as e:
@@ -83,7 +84,7 @@ def replenish(request):
     if request.method == "POST":
         account = Account.objects.get(user=request.user)
         try:
-            amount = float(request.POST['amount'])
+            amount = int(request.POST['amount'])
             TransactionManager.replenish(account, amount, request.POST['credentials'])
             messages.add_message(request, messages.INFO, "Successfully replenished for {}".format(request.POST['amount']))
             if account.sms_notifications:

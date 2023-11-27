@@ -7,7 +7,7 @@ from django.contrib import messages
 
 from app.models import Account
 from SMS.sms import SMSManager
-from authentication.validators import verify_credentials
+from authentication.validators import validate_account_data_register
 
 
 def login_user(request):
@@ -29,17 +29,15 @@ def signup_user(request):
     if request.method == "POST":
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
-        email = request.POST['email']
         phone = request.POST['phone']
         username = request.POST['username']
         password = request.POST['password']
         confirmed_password = request.POST['confirm_password']
-        if verify_credentials(first_name, last_name, email, phone, username, password, confirmed_password, request):
+        if validate_account_data_register(first_name, last_name, phone, username, password, confirmed_password, request):
             user = User.objects.create_user(first_name=first_name,
-                                     last_name=last_name,
-                                     email=email,
-                                     username=username,
-                                     password=password)
+                                            last_name=last_name,
+                                            username=username,
+                                            password=password)
             acc = Account.objects.get(user=user)
             acc.phone = phone
             acc.save()

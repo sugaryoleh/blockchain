@@ -84,7 +84,7 @@ class TransactionManager:
             raise Exception("Amount must be greater than 0")
         elif TransactionManager._is_authorized(credentials):
             bc = Blockchain.objects.first()
-            bc.total = float(bc.total) + amount
+            bc.total = int(bc.total) + amount
             bc.save()
             account.receive(amount)
 

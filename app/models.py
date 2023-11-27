@@ -13,7 +13,7 @@ from app.signatures import SignatureManager
 
 class Blockchain(models.Model):
     difficulty = models.IntegerField(blank=False, null=False, editable=False, default=4)
-    total = models.DecimalField(max_digits=1000, decimal_places=5, blank=False, null=False, editable=False, default=0)
+    total = models.IntegerField(blank=False, null=False, editable=False, default=0)
 
     def save(self, *args, **kwargs):
         if Blockchain.objects.exists() and not self.pk:
@@ -55,7 +55,7 @@ class KeyPair(models.Model):
 
 class Account(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name='user')
-    balance = models.DecimalField(max_digits=20, decimal_places=5)
+    balance = models.IntegerField(null=False, blank=False, default=0)
     key_pair = models.OneToOneField(to=KeyPair, on_delete=models.CASCADE, related_name='keys')
     phone = PhoneNumberField(null=False, blank=False, unique=False)
     sms_notifications = models.BooleanField(default=False)
@@ -65,11 +65,11 @@ class Account(models.Model):
         return '{}'.format(self.user)
 
     def receive(self, amount):
-        self.balance = float(self.balance) + amount
+        self.balance = int(self.balance) + amount
         self.save()
 
     def send(self, amount):
-        self.balance = float(self.balance) - amount
+        self.balance = int(self.balance) - amount
         self.save()
 
 
@@ -89,7 +89,7 @@ class Transaction(models.Model):
     sender = models.ForeignKey(to=Account, on_delete=models.PROTECT, related_name='sender_account',
                                blank=False, null=False)
     recipient = models.ForeignKey(to=Account, on_delete=models.PROTECT, related_name='recipient_account', blank=False, null=False)
-    amount = models.DecimalField(max_digits=20, decimal_places=5, blank=False, null=False)
+    amount = models.IntegerField(blank=False, null=False, default=0)
     timestamp = models.DateTimeField(editable=False, blank=False, null=False)
     signature = models.BinaryField()
 
@@ -108,7 +108,7 @@ class Transaction(models.Model):
         return {
             'sender': self.sender.__str__(),
             'recipient': self.recipient.__str__(),
-            'amount': float(self.amount),
+            'amount': self.amount.__str__(),
             'timestamp': self.timestamp.__str__(),
         }
 
@@ -116,11 +116,11 @@ class Transaction(models.Model):
 class Block(models.Model):
     index = models.BigAutoField(primary_key=True)
     transaction = models.OneToOneField(to=Transaction, on_delete=models.PROTECT)
-    previous_hash = models.CharField(max_length=5000, editable=False)
+    previous_hash = models.CharField(max_length=5000)
     nonce = models.PositiveIntegerField()
 
     def hash(self):
-        return _hash(self.transaction.__repr__(), self.previous_hash, self.nonce)
+        return _hash(self.transaction.__repr__(), self.nonce)
 
 
 @receiver(post_save, sender=Transaction)
@@ -129,19 +129,14 @@ def mine(sender, instance, created, **kwargs):
         difficulty = Blockchain.objects.first().difficulty
         block = Block(transaction=instance, nonce=0)
         try:
-            block.previous_hash = Block.objects.order_by("pk").reverse()[0].hash()
+            last_block = Block.objects.order_by("pk").reverse()[0]
+            block.previous_hash = last_block.hash()
         except IndexError:
             block.previous_hash = '0' * 64
 
         while True:
             if block.hash()[:difficulty] == '0' * difficulty:
-                print("success, 4*0: {}".format(block.hash()))
-                print("hash data: transaction {}; prev hash: {}; nonce {}".format(block.transaction.__repr__(),
-                                                                                  block.previous_hash, block.nonce))
                 block.save()
-                print("updated, 4*0: {}".format(block.hash()))
-                print("hash data: transaction {}; prev hash: {}; nonce {}".format(block.transaction.__repr__(),
-                                                                                  block.previous_hash, block.nonce))
                 break
             else:
                 block.nonce += 1
