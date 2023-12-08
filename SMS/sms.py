@@ -10,8 +10,8 @@ class SMSManager:
         return cls.instance
 
     def __init__(self):
-        self.account_sid = 'ACcad6965fda69b920669963d3d01e6831'
-        self.auth_token = '7d768a3c3dec8752386255af069c8aba'
+        self.account_sid = None # your accound sid
+        self.auth_token = None # your accound token
         self.client = Client(self.account_sid, self.auth_token)
 
     def send_message(self, text: str, to: str) -> None:
